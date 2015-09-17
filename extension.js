@@ -1,4 +1,6 @@
-let _windows, _lastMonitorCount, _connectedSignals, _windowSignals, _firstLoad;
+let _windows, _lastMonitorCount, _connectedSignals, _windowSignals, _firstLoad, _textScalingFactorSingle = 1.2, _textScalingFactorMulti = 1.0;
+let gio = imports.gi.Gio;
+let interfaceSchema = new gio.Settings({schema: "org.gnome.desktop.interface"});
 
 function _handleMonitorChange() {
    let currentMonitorCount = global.screen.get_n_monitors();
@@ -6,7 +8,17 @@ function _handleMonitorChange() {
    if (currentMonitorCount > _lastMonitorCount && currentMonitorCount > 1) {
       _returnWindows();
    }
+   if (currentMonitorCount == 1) {
+      _setTextScalingFactor(_textScalingFactorSingle);
+   }
+   else {
+      _setTextScalingFactor(_textScalingFactorMulti);
+   }
    _lastMonitorCount = currentMonitorCount;
+}
+
+function _setTextScalingFactor(textScalingFactor) {
+   interfaceSchema.set_double("text-scaling-factor", textScalingFactor);
 }
 
 function _updateWindowList(isNew) {
